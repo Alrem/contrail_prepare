@@ -1,6 +1,14 @@
 #!/bin/bash
 set -x
 
+function verify_volumes{
+	if [ ! -f /root/.ssh/id_rsa ]
+	then
+		echo "You should run the container with some attached volumes. Example:"
+		echo "docker run --rm -v /root/.ssh:/root/.ssh:ro -v /etc/hosts:/etc/hosts:ro alrem/contrail_prepare"
+	fi
+}
+
 function ntw_define {
     ansible all -i 'ntw01, ' -u root -m ping && export NTW=ntw01
     test $NTW || export NTW=ctl01
@@ -9,6 +17,25 @@ function ntw_define {
 
 }
 
+function verify_exports {
+	echo "You will use the following exports/variables:"
+	echo
+	echo "ROUTER_IP=$ROUTER_IP"
+	echo "NTW=$NTW"
+	echo "NTWVIP=$NTWVIP"
+	echo "EXT_NET=$EXT_NET"
+	echo
+	echo -n "Is everything correct (YY/n) ? "
+	read item
+	case "$item" in
+	    y|Y) echo "OK"
+	        ;;
+	    n|N) echo "You can change the exports at start, for example:"
+			 echo 'docker run --rm -v /root/.ssh:/root/.ssh:ro -v /etc/hosts:/etc/hosts:ro -e EXT_NET="10.10.10.0/24" alrem/contrail_prepare'
+	        exit 0
+	        ;;
+	esac
+}
 
 test $NTW && export NTWVIP=$NTW
 test $NTWVIP || ntw_define
