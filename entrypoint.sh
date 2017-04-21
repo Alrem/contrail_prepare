@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 
 function verify_volumes {
 	if [ ! -f /root/.ssh/id_rsa ]
@@ -26,7 +26,7 @@ function verify_exports {
 	echo "NTWVIP=$NTWVIP"
 	echo "EXT_NET=$EXT_NET"
 	echo
-	echo -n "Is everything correct (YY/n) ? "
+	echo -n "Is everything correct (Y/n) ? "
 	read item
 	case "$item" in
 	    y|Y) echo "OK"
