@@ -1,15 +1,14 @@
 #!/bin/bash
 set -x
 
-function ntw_define {
-    (ansible all -i 'ntw01, ' -u root -m ping && export NTW=ntw01) || export NTW=ctl01
-    NTWVIP=`cat /etc/hosts | grep 'ntw '| awk '{print $1}'`
-    test $NTWVIP || NTWVIP=`cat /etc/hosts | grep 'ctl01'| awk '{print $1}'`
-
-}
-
-
-(test $NTW && NTWVIP=$NTW ) || ntw_define
+test $NTW && NTWVIP=$NTW
+if [ ! $NTWVIP ]
+then
+  ansible all -i 'ntw01, ' -u root -m ping && export NTW=ntw01
+  test $NTW || export NTW=ctl01
+  export NTWVIP=`cat /etc/hosts | grep 'ntw '| awk '{print $1}'`
+  test $NTWVIP || export NTWVIP=`cat /etc/hosts | grep 'ctl01'| awk '{print $1}'`
+fi
 
 ansible all -i "ctl01, " -u root -m command -a 'cat ~/keystonercv3' | grep export > keystonerc
 source keystonerc

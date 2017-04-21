@@ -1,15 +1,12 @@
 FROM ubuntu
 MAINTAINER Oleksandr Kosse <okosse@mirantis.com>
 
-VOLUME /root/.ssh:/root/.ssh:ro
-VOLUME /etc/hosts:/etc/hosts:ro
-
 RUN  apt-get update -qq &&  \
 apt-get install -q -y \
     ansible \
     python-pip && \
 sed -ie 's/#host_key_checking/host_key_checking/g' /etc/ansible/ansible.cfg && \
-pip install python-openstackclient && \
+pip install python-openstackclient pip --upgrade && \
 apt-get clean  && \
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
