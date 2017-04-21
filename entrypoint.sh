@@ -1,11 +1,12 @@
 #!/bin/bash
 set -x
 
-function verify_volumes{
+function verify_volumes {
 	if [ ! -f /root/.ssh/id_rsa ]
 	then
 		echo "You should run the container with some attached volumes. Example:"
 		echo "docker run --rm -v /root/.ssh:/root/.ssh:ro -v /etc/hosts:/etc/hosts:ro alrem/contrail_prepare"
+		exit 1
 	fi
 }
 
