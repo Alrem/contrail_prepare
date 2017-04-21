@@ -37,8 +37,10 @@ function verify_exports {
 	esac
 }
 
+verify_volumes
 test $NTW && export NTWVIP=$NTW
 test $NTWVIP || ntw_define
+verify_exports
 
 ansible all -i "ctl01, " -u root -m command -a 'cat ~/keystonercv3' | grep export > keystonerc
 source keystonerc
