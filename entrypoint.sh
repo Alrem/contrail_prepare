@@ -1,14 +1,17 @@
 #!/bin/bash
 set -x
 
-test $NTW && NTWVIP=$NTW
-if [ ! $NTWVIP ]
-then
-  ansible all -i 'ntw01, ' -u root -m ping && export NTW=ntw01
-  test $NTW || export NTW=ctl01
-  export NTWVIP=`cat /etc/hosts | grep 'ntw '| awk '{print $1}'`
-  test $NTWVIP || export NTWVIP=`cat /etc/hosts | grep 'ctl01'| awk '{print $1}'`
-fi
+function ntw_define {
+    ansible all -i 'ntw01, ' -u root -m ping && export NTW=ntw01
+    test $NTW || export NTW=ctl01
+    export NTWVIP=`cat /etc/hosts | grep 'ntw '| awk '{print $1}'`
+    test $NTWVIP || export NTWVIP=`cat /etc/hosts | grep 'ctl01'| awk '{print $1}'`
+
+}
+
+
+test $NTW && export NTWVIP=$NTW
+test $NTWVIP || ntw_define
 
 ansible all -i "ctl01, " -u root -m command -a 'cat ~/keystonercv3' | grep export > keystonerc
 source keystonerc
@@ -49,7 +52,7 @@ ansible all -i "$NTW, " -u root -m command -a \
 		--admin_user $OS_USERNAME \
 		--admin_password $OS_PASSWORD \
 		--admin_tenant_name $OS_TENANT_NAME \
-		--api_server_ip $NTW \
+		--api_server_ip $NTWVIP \
 		--api_server_port 8082"
 
 
